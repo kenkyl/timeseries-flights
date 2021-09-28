@@ -20,6 +20,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.redislabs</groupId>
+      <artifactId>jredistimeseries</artifactId>
+      <version>1.6.0-RC1</version>
+    </dependency>
+    <dependency>
       <groupId>io.lettuce</groupId>
       <artifactId>lettuce-core</artifactId>
       <version>6.1.5.RELEASE</version>
