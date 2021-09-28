@@ -23,22 +23,32 @@ public class App
         // read flights from csv
         List<FlightTimeSeries> flights = new ArrayList<FlightTimeSeries>();
         //parsing a CSV file into Scanner class constructor
-        Scanner sc = null;
+        BufferedReader br = null;
         try {
             //sc = new Scanner(new File("src/main/resources/flight-data.csv"));
-            BufferedReader br = new BufferedReader(new FileReader("src/main/resources/flight-data.csv"));
+            br = new BufferedReader(new FileReader("src/main/resources/flight-data.csv"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
         //sc.useDelimiter(",");   //sets the delimiter pattern
+        String csvLine;
+        while (true) {
+            try {
+                if (!((csvLine = br.readLine()) != null)) break;
+                String[] flightInfo = csvLine.split(", ");
+                flights.add(new FlightTimeSeries(Integer.valueOf(flightInfo[0]), flightInfo[1], flightInfo[2]));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
-        while (sc.hasNext())  //returns a boolean value
-        {
-            String[] flightInfo = sc.next().split(" ");
-            flights.add(new FlightTimeSeries(Integer.valueOf(flightInfo[0]), flightInfo[1], flightInfo[2]));
-            System.out.print(sc.next());  //find and returns the next complete token from this scanner
         }
-        sc.close();  //closes the scanner
+//        while (sc.hasNext())  //returns a boolean value
+//        {
+//            String[] flightInfo = sc.next().split(" ");
+//            flights.add(new FlightTimeSeries(Integer.valueOf(flightInfo[0]), flightInfo[1], flightInfo[2]));
+//            System.out.print(sc.next());  //find and returns the next complete token from this scanner
+//        }
+//        sc.close();  //closes the scanner
 
         flights.forEach((f) -> {
             f.startTimeSeries();
