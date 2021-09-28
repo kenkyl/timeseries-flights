@@ -1,14 +1,10 @@
 package com.redis.timeSeriesFlights;
-//import io.lettuce.core.*;
-import io.lettuce.core.RedisClient;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.sync.RedisCommands;
 
 import com.redislabs.redistimeseries.*;
 import redis.clients.jedis.exceptions.JedisDataException;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.io.*;
 
 /**
  * Hello world!
@@ -18,23 +14,50 @@ public class App
 {
     public static void main( String[] args )
     {
+
         System.out.println( "Hello World!" );
-        RedisClient redisClient = RedisClient.create("redis://localhost:6379/0");
-        StatefulRedisConnection<String, String> connection = redisClient.connect();
-        RedisCommands<String, String> syncCommands = connection.sync();
+        //timeSeriesTest();
+        FlightTimeSeries fts1 = new FlightTimeSeries(1011, "DFW", "LGA");
+        fts1.startTimeSeries();
 
-        syncCommands.set("key", "Hello, Redis!");
+        // read flights from csv
+        List<FlightTimeSeries> flights = new ArrayList<FlightTimeSeries>();
+        //parsing a CSV file into Scanner class constructor
+        Scanner sc = null;
+        try {
+            //sc = new Scanner(new File("src/main/resources/flight-data.csv"));
+            BufferedReader br = new BufferedReader(new FileReader("src/main/resources/flight-data.csv"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        //sc.useDelimiter(",");   //sets the delimiter pattern
 
-        String result = syncCommands.get("key");
+        while (sc.hasNext())  //returns a boolean value
+        {
+            String[] flightInfo = sc.next().split(" ");
+            flights.add(new FlightTimeSeries(Integer.valueOf(flightInfo[0]), flightInfo[1], flightInfo[2]));
+            System.out.print(sc.next());  //find and returns the next complete token from this scanner
+        }
+        sc.close();  //closes the scanner
 
-        System.out.println(result);
-
-        connection.close();
-        redisClient.shutdown();
-
-        timeSeriesTest();
+        flights.forEach((f) -> {
+            f.startTimeSeries();
+        });
     }
 
+
+
+
+    /* some flight numbers
+     * 1011 DFW -> LGA
+     * 1043 BOS -> MIA
+     * 1147 PHX -> MIA
+     * 1089 AUS -> JFK
+     * 2913 AUS -> DFW
+     * 2492 MIA -> JFK
+     * 2130 BOS -> LGA
+     * 1887 PHX -> DFW
+     */
     private static void timeSeriesTest() {
         RedisTimeSeries rts = new RedisTimeSeries("localhost", 6379);
    
@@ -57,7 +80,9 @@ public class App
         // Get all the timeseries in US in the last 10min average per min  
         Range[] result = rts.mrange(System.currentTimeMillis()/1000 - 10*60, System.currentTimeMillis()/1000, Aggregation.AVG, 60, "country=US");
         for (Range r : result) {
-            System.out.println(r);
+            for (Value v : r.getValues()) {
+                System.out.println(v);
+            }
         }
         System.out.println(result.toString());
     }
