@@ -4,7 +4,7 @@ import java.util.*;
 import com.redislabs.redistimeseries.*;
 import redis.clients.jedis.exceptions.JedisDataException;
 
-public class FlightTimeSeries {
+public class FlightTimeSeries extends Thread {
     private Integer flightNumber;
     private String origin;
     private String destination;
@@ -15,7 +15,8 @@ public class FlightTimeSeries {
         this.destination = destination;
     }
 
-    public void startTimeSeries() {
+    public void run() {
+        String keyName = String.format("flights:%d", this.flightNumber);
         RedisTimeSeries rts = new RedisTimeSeries("localhost", 6379);
 
         Map<String, String> labels = new HashMap<>();
@@ -23,6 +24,15 @@ public class FlightTimeSeries {
         labels.put("flightNum", this.flightNumber.toString());
         labels.put("orig", this.origin);
         labels.put("dest", this.destination);
+
+        try {
+            rts.create(keyName, labels);
+        } catch (JedisDataException e) {
+            System.out.println("Key already exists. Continue...");
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+            return;
+        }
 
         System.out.println(String.format("Inserting TS data for Flight # %d from %s to %s", this.flightNumber, this.origin, this.destination));
 
@@ -37,7 +47,7 @@ public class FlightTimeSeries {
                 e.printStackTrace();
             }
             // NOTE - add a value of 1 to indicate a missed flight
-            rts.add("cpu1", System.currentTimeMillis()/1000 /* time sec */, 1.0);
+            rts.add(keyName,1.0);
             System.out.println(String.format("Missed flight for Flight # %d", this.flightNumber));
         }
     }
