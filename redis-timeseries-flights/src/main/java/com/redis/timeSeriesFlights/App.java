@@ -7,7 +7,6 @@ import java.util.*;
 import java.io.*;
 
 /**
- * Hello world!
  *
  */
 public class App 
@@ -28,11 +27,11 @@ public class App
             try {
                 if (!((csvLine = br.readLine()) != null)) break;
                 String[] flightInfo = csvLine.split(", ");
+                // add flight info to ArrayList
                 flights.add(new FlightTimeSeries(Integer.valueOf(flightInfo[0]), flightInfo[1], flightInfo[2]));
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
 
         // start each flight timeseries thread to generate data
@@ -42,7 +41,7 @@ public class App
     }
 
     /* example queries:
-     * TS.MRANGE - + WITHLABELS AGGREGATION SUM 6000 FILTER type=flight GROUPBY dest REDUCE SUM
-     *
+     * TS.MRANGE - + WITHLABELS AGGREGATION SUM 10000 FILTER type=flight GROUPBY dest REDUCE SUM
+     * TS.MRANGE - + WITHLABELS AGGREGATION SUM 10000 FILTER type=flight GROUPBY orig REDUCE SUM
     */
 }

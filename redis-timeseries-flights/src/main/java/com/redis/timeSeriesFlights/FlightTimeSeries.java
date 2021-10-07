@@ -15,8 +15,11 @@ public class FlightTimeSeries extends Thread {
         this.destination = destination;
     }
 
+    /*
+    * Generates "missed flight data" by
+    */
     public void run() {
-        String keyName = String.format("flights:%d", this.flightNumber);
+        String keyName = String.format("missed-flights:%d", this.flightNumber);
         RedisTimeSeries rts = new RedisTimeSeries("localhost", 6379);
 
         Map<String, String> labels = new HashMap<>();
@@ -25,6 +28,7 @@ public class FlightTimeSeries extends Thread {
         labels.put("orig", this.origin);
         labels.put("dest", this.destination);
 
+        // create the TimeSeries key for the flight
         try {
             rts.create(keyName, labels);
         } catch (JedisDataException e) {
@@ -36,17 +40,17 @@ public class FlightTimeSeries extends Thread {
 
         System.out.println(String.format("Inserting TS data for Flight # %d from %s to %s", this.flightNumber, this.origin, this.destination));
 
-        Random rand = new Random(); //instance of random class
+        Random rand = new Random();
         int upperbound = 30;
         while (true) {
-            //generate random values from 0-30
+            // generate random interval between 1 and 30 seconds
             int interval = rand.nextInt(upperbound);
             try {
                 Thread.sleep(interval * 1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            // NOTE - add a value of 1 to indicate a missed flight
+            // Add a value of 1 to denote a missed flight
             rts.add(keyName,1.0);
             System.out.println(String.format("Missed flight for Flight # %d", this.flightNumber));
         }
