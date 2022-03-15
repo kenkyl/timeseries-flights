@@ -41,7 +41,7 @@ public class FlightTimeSeries extends Thread {
         System.out.println(String.format("Inserting TS data for Flight # %d from %s to %s", this.flightNumber, this.origin, this.destination));
 
         Random rand = new Random();
-        int upperbound = 30;
+        int upperbound = 60;
         while (true) {
             // generate random interval between 1 and 30 seconds
             int interval = rand.nextInt(upperbound);

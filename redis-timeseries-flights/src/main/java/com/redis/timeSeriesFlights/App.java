@@ -41,7 +41,8 @@ public class App
     }
 
     /* example queries:
-     * TS.MRANGE - + WITHLABELS AGGREGATION SUM 10000 FILTER type=flight GROUPBY dest REDUCE SUM
-     * TS.MRANGE - + WITHLABELS AGGREGATION SUM 10000 FILTER type=flight GROUPBY orig REDUCE SUM
+     * TS.MRANGE - + WITHLABELS AGGREGATION SUM 60000 FILTER type=flight
+     * TS.MRANGE - + WITHLABELS AGGREGATION SUM 60000 FILTER type=flight GROUPBY dest REDUCE SUM
+     * TS.CREATERULE missed-flights:1011 missed-flights-agg:1011 AGGREGATION sum 3600000
     */
 }
